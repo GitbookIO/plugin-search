@@ -16,6 +16,9 @@ module.exports = {
         assets: './assets',
         js: [
             'lunr.min.js', 'search.js'
+        ],
+        css: [
+            'search.css'
         ]
     },
 

@@ -21,5 +21,11 @@
     },
     "scripts": {
         "prepublish": "cp node_modules/lunr/lunr.min.js ./assets/lunr.min.js"
+    },
+    "devDependencies": {
+        "less": "2.5.1"
+    },
+    "scripts": {
+        "prepublish": "lessc ./less/search.less > ./assets/search.css"
     }
 }
