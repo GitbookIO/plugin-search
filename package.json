@@ -18,5 +18,8 @@
     "license": "Apache-2.0",
     "bugs": {
         "url": "https://github.com/GitbookIO/plugin-search/issues"
+    },
+    "scripts": {
+        "prepublish": "cp node_modules/lunr/lunr.min.js ./assets/lunr.min.js"
     }
 }
