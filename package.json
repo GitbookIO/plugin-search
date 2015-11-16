@@ -24,5 +24,14 @@
     },
     "scripts": {
         "prepublish": "cp node_modules/lunr/lunr.min.js ./assets/lunr.min.js;lessc ./less/search.less > ./assets/search.css"
+    },
+    "gitbook": {
+        "properties": {
+            "maxIndexSize": {
+                "type": "number",
+                "title": "Limit size for the index",
+                "default": 1000000
+            }
+        }
     }
 }

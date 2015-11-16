@@ -11,6 +11,9 @@ var searchIndex = lunr(function () {
     this.field('body');
 });
 
+var searchIndexEnabled = true;
+var indexSize = 0;
+
 module.exports = {
     book: {
         assets: './assets',
@@ -25,7 +28,8 @@ module.exports = {
     hooks: {
         // Index each page
         "page": function(page) {
-            if (this.options.generator != 'website') return page;
+            if (this.options.generator != 'website' || !searchIndexEnabled) return page;
+            var maxIndexSize = this.config.get('pluginsConfig.search.maxIndexSize') || this.config.get('search.maxIndexSize')
 
             this.log.debug.ln('index page', page.path);
 
@@ -34,6 +38,13 @@ module.exports = {
 
             // Transform as TEXT
             var text = html.replace(/(<([^>]+)>)/ig, '');
+
+            indexSize = indexSize + text.length;
+            if (indexSize > maxIndexSize) {
+                this.log.warn.ln("search index is too big, indexing is now disabled");
+                searchIndexEnabled = false;
+                return page;
+            }
 
             // Add to index
             searchIndex.add({
