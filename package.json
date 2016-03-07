@@ -2,7 +2,7 @@
     "name": "gitbook-plugin-search",
     "description": "Search content from your book",
     "main": "index.js",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "engines": {
         "gitbook": ">=3.0.0-pre.0"
     },
