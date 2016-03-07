@@ -28,16 +28,15 @@ module.exports = {
     hooks: {
         // Index each page
         "page": function(page) {
-            if (this.options.generator != 'website' || !searchIndexEnabled) return page;
-            var maxIndexSize = this.config.get('pluginsConfig.search.maxIndexSize') || this.config.get('search.maxIndexSize')
+            if (this.output.name != 'website' || !searchIndexEnabled) return page;
+
+            var text, maxIndexSize;
+            maxIndexSize = this.config.get('pluginsConfig.search.maxIndexSize') || this.config.get('search.maxIndexSize');
 
             this.log.debug.ln('index page', page.path);
 
-            // Extract HTML
-            var html = _.pluck(page.sections, 'content').join(' ');
-
             // Transform as TEXT
-            var text = html.replace(/(<([^>]+)>)/ig, '');
+            text = page.content.replace(/(<([^>]+)>)/ig, '');
 
             indexSize = indexSize + text.length;
             if (indexSize > maxIndexSize) {
@@ -48,8 +47,8 @@ module.exports = {
 
             // Add to index
             searchIndex.add({
-                url: this.contentLink(page.path),
-                title: page.progress.current.title,
+                url: this.output.toURL(page.path),
+                title: page.title,
                 body: text
             });
 
@@ -58,13 +57,10 @@ module.exports = {
 
         // Write index to disk
         "finish": function() {
-            if (this.options.generator != 'website') return;
+            if (this.output.name != 'website') return;
 
             this.log.debug.ln('write search index');
-            fs.writeFileSync(
-                path.join(this.options.output, "search_index.json"),
-                JSON.stringify(searchIndex)
-            );
+            return this.output.writeFile('search_index.json', JSON.stringify(searchIndex));
         }
     }
 };
