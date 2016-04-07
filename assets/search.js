@@ -1,18 +1,18 @@
 require([
-    "gitbook",
-    "lodash"
-], function(gitbook, _) {
+    'gitbook',
+    'jquery'
+], function(gitbook, $) {
     var index = null;
     var $searchInput, $searchForm;
 
     // Use a specific index
     function loadIndex(data) {
-        index = lunr.Index.load(data);
+        index = lunr.Index.load(data); // eslint-disable-line no-undef
     }
 
     // Fetch the search index
     function fetchIndex() {
-        $.getJSON(gitbook.state.basePath+"/search_index.json")
+        $.getJSON(gitbook.state.basePath+'/search_index.json')
         .then(loadIndex);
     }
 
@@ -20,15 +20,14 @@ require([
     function search(q) {
         if (!index) return;
 
-        var results = _.chain(index.search(q))
-        .map(function(result) {
-            var parts = result.ref.split("#")
-            return {
-                path: parts[0],
-                hash: parts[1]
-            }
-        })
-        .value();
+        var results = $.map(index.search(q),
+            function(result) {
+                var parts = result.ref.split('#');
+                return {
+                    path: parts[0],
+                    hash: parts[1]
+                };
+            });
 
         return results;
     }
@@ -55,14 +54,14 @@ require([
 
     // Return true if search is open
     function isSearchOpen() {
-        return gitbook.state.$book.hasClass("with-search");
+        return gitbook.state.$book.hasClass('with-search');
     }
 
     // Toggle the search
     function toggleSearch(_state) {
         if (isSearchOpen() === _state) return;
 
-        gitbook.state.$book.toggleClass("with-search", _state);
+        gitbook.state.$book.toggleClass('with-search', _state);
 
         // If search bar is open: focus input
         if (isSearchOpen()) {
@@ -70,14 +69,14 @@ require([
             $searchInput.focus();
         } else {
             $searchInput.blur();
-            $searchInput.val("");
+            $searchInput.val('');
             gitbook.sidebar.filter(null);
         }
     }
 
     // Recover current search when page changed
     function recoverSearch() {
-        var keyword = gitbook.storage.get("keyword", "");
+        var keyword = gitbook.storage.get('keyword', '');
 
         createForm(keyword);
 
@@ -85,18 +84,21 @@ require([
             if(!isSearchOpen()) {
                 toggleSearch();
             }
-            gitbook.sidebar.filter(_.pluck(search(keyword), "path"));
+
+            var paths = $.map(search(keyword), function(v) {
+                return v['path'];
+            });
+            gitbook.sidebar.filter(paths);
         }
-    };
+    }
 
-
-    gitbook.events.bind("start", function(config) {
+    gitbook.events.bind('start', function(config) {
         // Pre-fetch search index and create the form
         fetchIndex();
         createForm();
 
         // Type in search bar
-        $(document).on("keyup", ".book-search input", function(e) {
+        $(document).on('keyup', '.book-search input', function(e) {
             var key = (e.keyCode ? e.keyCode : e.which);
             var q = $(this).val();
 
@@ -107,13 +109,15 @@ require([
             }
             if (q.length == 0) {
                 gitbook.sidebar.filter(null);
-                gitbook.storage.remove("keyword");
+                gitbook.storage.remove('keyword');
             } else {
                 var results = search(q);
-                gitbook.sidebar.filter(
-                    _.pluck(results, "path")
-                );
-                gitbook.storage.set("keyword", q);
+                var paths = $.map(results, function(v) {
+                    return v['path'];
+                });
+
+                gitbook.sidebar.filter(paths);
+                gitbook.storage.set('keyword', q);
             }
         });
 
@@ -126,10 +130,10 @@ require([
         });
 
         // Bind keyboard to toggle search
-        gitbook.keyboard.bind(['f'], toggleSearch)
+        gitbook.keyboard.bind(['f'], toggleSearch);
     });
 
-    gitbook.events.bind("page.change", recoverSearch);
+    gitbook.events.bind('page.change', recoverSearch);
 });
 
 
