@@ -18,16 +18,15 @@ require([
 
     // Search for a term and return results
     function search(q) {
-        if (!index) return;
+        if (!index) return [];
 
-        var results = $.map(index.search(q),
-            function(result) {
-                var parts = result.ref.split('#');
-                return {
-                    path: parts[0],
-                    hash: parts[1]
-                };
-            });
+        var results = index.search(q).map(function(result) {
+            var parts = result.ref.split('#');
+            return {
+                path: parts[0],
+                hash: parts[1]
+            };
+        });
 
         return results;
     }
@@ -85,7 +84,7 @@ require([
                 toggleSearch();
             }
 
-            var paths = $.map(search(keyword), function(v) {
+            var paths = search(keyword).map(function(v) {
                 return v['path'];
             });
             gitbook.sidebar.filter(paths);
@@ -112,7 +111,7 @@ require([
                 gitbook.storage.remove('keyword');
             } else {
                 var results = search(q);
-                var paths = $.map(results, function(v) {
+                var paths = results.map(function(v) {
                     return v['path'];
                 });
 
