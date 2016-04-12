@@ -1,3 +1,10 @@
+// Search
+@search-results-max-width:            600px;
+@search-padding-default:              1.5rem;
+@search-results-opacity:              0.95;
+@gb-palette-blue:                     #428bca;
+@search-highlight-color:              yellow;
+
 .book {
     .book-summary  .book-search {
         padding: 6px;
@@ -31,6 +38,42 @@
             ul.summary {
                 top: 50px;
             }
+        }
+    }
+}
+
+.book-search-results {
+    .search-results {
+        display: none;
+
+        ul.search-results-list {
+            list-style-type: none;
+            padding-left: 0;
+
+            li {
+                margin-bottom: @search-padding-default;
+                padding-bottom: @search-padding-default/3;
+                max-width: @search-results-max-width;
+
+                a {
+                    /* @gb-palette-blue */
+                    color: @gb-palette-blue;
+                }
+
+                /* Highlight results */
+                p em {
+                    background-color: @search-highlight-color;
+                }
+            }
+        }
+    }
+
+    &.open {
+        .search-results {
+            display: block;
+        }
+        .search-noresults {
+            display: none;
         }
     }
 }
