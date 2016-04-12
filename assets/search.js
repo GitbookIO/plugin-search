@@ -2,65 +2,41 @@ require([
     'gitbook',
     'jquery'
 ], function(gitbook, $) {
-    var index = null;
-    var $searchInput, $searchForm;
+    var $bookSearchResults;
+    var $searchInput;
+    var $searchList;
+    var $searchTitle;
 
-    // Use a specific index
-    function loadIndex(data) {
-        index = lunr.Index.load(data); // eslint-disable-line no-undef
+    // Throttle search
+    function throttle(fn, wait) {
+        var timeout;
+
+        return function() {
+            var ctx = this, args = arguments;
+            if (!timeout) {
+                timeout = setTimeout(function() {
+                    timeout = null;
+                    fn.apply(ctx, args);
+                }, wait);
+            }
+        };
     }
 
-    // Fetch the search index
-    function fetchIndex() {
-        $.getJSON(gitbook.state.basePath+'/search_index.json')
-        .then(loadIndex);
-    }
-
-    // Search for a term and return results
-    function search(q) {
-        if (!index) return [];
-
-        var results = index.search(q).map(function(result) {
-            var parts = result.ref.split('#');
-            return {
-                path: parts[0],
-                hash: parts[1]
-            };
-        });
-
-        return results;
-    }
-
-    // Create search form
-    function createForm(value) {
-        if ($searchForm) $searchForm.remove();
-
-        $searchForm = $('<div>', {
-            'class': 'book-search',
-            'role': 'search'
-        });
-
-        $searchInput = $('<input>', {
-            'type': 'text',
-            'class': 'form-control',
-            'val': value,
-            'placeholder': 'Type to search'
-        });
-
-        $searchInput.appendTo($searchForm);
-        $searchForm.prependTo(gitbook.state.$book.find('.book-summary'));
+    // Update search input
+    function updateInput(value) {
+        $searchInput.val(value);
     }
 
     // Return true if search is open
     function isSearchOpen() {
-        return gitbook.state.$book.hasClass('with-search');
+        return $bookSearchResults.hasClass('open');
     }
 
     // Toggle the search
     function toggleSearch(_state) {
         if (isSearchOpen() === _state) return;
 
-        gitbook.state.$book.toggleClass('with-search', _state);
+        $bookSearchResults.toggleClass('open', _state);
 
         // If search bar is open: focus input
         if (isSearchOpen()) {
@@ -69,32 +45,69 @@ require([
         } else {
             $searchInput.blur();
             $searchInput.val('');
-            gitbook.sidebar.filter(null);
+            $bookSearchResults.removeClass('open');
         }
+    }
+
+    function displayResults(results) {
+        $bookSearchResults.addClass('open');
+
+        // Clear old results
+        $searchList.empty();
+
+        // Display title for research
+        $searchTitle.text('Search results for '+gitbook.storage.get('keyword', ''));
+
+        // Create an <li> element for each result
+        results.hits.forEach(function(res) {
+            var $li = $('<li>', {
+                'class': 'search-results-item'
+            });
+
+            var $title = $('<h3>');
+
+            var $link = $('<a>', {
+                'href': res.url,
+                'text': res.title || res.url
+            });
+
+            var content = res.body? res.body.slice(0, 350)+'...' : '';
+            var $content = $('<p>').html(content);
+
+            $link.appendTo($title);
+            $title.appendTo($li);
+            $content.appendTo($li);
+            $li.appendTo($searchList);
+        });
     }
 
     // Recover current search when page changed
     function recoverSearch() {
         var keyword = gitbook.storage.get('keyword', '');
 
-        createForm(keyword);
+        updateInput(keyword);
 
         if (keyword.length > 0) {
             if(!isSearchOpen()) {
                 toggleSearch();
             }
 
-            var paths = search(keyword).map(function(v) {
-                return v['path'];
+            gitbook.search.query(keyword)
+            .then(function(results) {
+                displayResults(results);
             });
-            gitbook.sidebar.filter(paths);
         }
     }
 
-    gitbook.events.bind('start', function(config) {
-        // Pre-fetch search index and create the form
-        fetchIndex();
-        createForm();
+    gitbook.events.bind('start', function(e, config) {
+        // Bind DOM
+        $bookSearchResults = gitbook.state.$book.find('div.book-search-results');
+        $searchInput       = gitbook.state.$book.find('input[name="search-input"]');
+        $searchList        = gitbook.state.$book.find('ul.search-results-list');
+        $searchTitle       = gitbook.state.$book.find('h1.search-results-title');
+
+        // Create the form
+        updateInput();
 
         // Type in search bar
         $(document).on('keyup', '.book-search input', function(e) {
@@ -103,20 +116,19 @@ require([
 
             if (key == 27) {
                 e.preventDefault();
+                gitbook.storage.remove('keyword');
                 toggleSearch(false);
                 return;
             }
             if (q.length == 0) {
-                gitbook.sidebar.filter(null);
                 gitbook.storage.remove('keyword');
+                $bookSearchResults.removeClass('open');
             } else {
-                var results = search(q);
-                var paths = results.map(function(v) {
-                    return v['path'];
-                });
-
-                gitbook.sidebar.filter(paths);
-                gitbook.storage.set('keyword', q);
+                throttle(gitbook.research.query(q)
+                .then(function(results) {
+                    gitbook.storage.set('keyword', q);
+                    displayResults(results);
+                }), 1000);
             }
         });
 
