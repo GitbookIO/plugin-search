@@ -1,0 +1,19 @@
+{% extends template.self %}
+
+{% block search_input %}
+<div class="book-search" role="search">
+    <input name="search-input" type="text" class="form-control" placeholder="Type to search" />
+</div>
+{% endblock %}
+
+{% block search_results %}
+<div class="book-search-results">
+    <div class="search-noresults">
+    {{ super() }}
+    </div>
+    <div class="search-results">
+        <h1 class="search-results-title"></h1>
+        <ul class="search-results-list"></ul>
+    </div>
+</div>
+{% endblock %}
