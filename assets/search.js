@@ -66,7 +66,7 @@ require([
             var $title = $('<h3>');
 
             var $link = $('<a>', {
-                'href': res.path,
+                'href': gitbook.state.root+res.url,
                 'text': res.title
             });
 
