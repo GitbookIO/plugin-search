@@ -26,7 +26,7 @@ require([
     };
 
     // Search for a term and return results
-    LunrSearchEngine.prototype.search = function(q) {
+    LunrSearchEngine.prototype.search = function(q, offset, length) {
         var that = this;
         var results = [];
 
@@ -44,7 +44,7 @@ require([
 
         return $.Deferred().resolve({
             query: q,
-            results: results,
+            results: results.slice(0, length),
             count: results.length
         }).promise();
     };
