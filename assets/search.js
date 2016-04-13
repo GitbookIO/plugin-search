@@ -42,7 +42,9 @@ require([
 
         // If search bar is open: focus input
         if (isSearchOpen()) {
-            gitbook.sidebar.toggle(true);
+            if (gitbook.sidebar) {
+                gitbook.sidebar.toggle(true);
+            }
             $searchInput.focus();
         } else {
             $searchInput.blur();
