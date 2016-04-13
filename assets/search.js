@@ -84,8 +84,8 @@ require([
         // Bind DOM
         $searchInput        = $('#book-search-input');
         $bookSearchResults  = $('#book-search-results');
-        $searchList         = $bookSearchResults.find('ul.search-results-list');
-        $searchTitle        = $bookSearchResults.find('h1.search-results-title');
+        $searchList         = $bookSearchResults.find('.search-results-list');
+        $searchTitle        = $bookSearchResults.find('.search-results-title');
         $searchResultsCount = $searchTitle.find('.search-results-count');
         $searchQuery        = $searchTitle.find('.search-query');
 
