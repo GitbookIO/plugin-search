@@ -2,6 +2,9 @@ require([
     'gitbook',
     'jquery'
 ], function(gitbook, $) {
+    var MAX_RESULTS = 15;
+    var MAX_DESCRIPTION_SIZE = 500;
+
     // DOM Elements
     var $body = $('body');
     var $bookSearchResults;
@@ -10,8 +13,6 @@ require([
     var $searchTitle;
     var $searchResultsCount;
     var $searchQuery;
-
-    var MAX_RESULTS = 15;
 
     // Throttle search
     function throttle(fn, wait) {
@@ -76,9 +77,9 @@ require([
                 'text': res.title
             });
 
-            var content = res.body;
-            if (content.length > 500) {
-                content = content.slice(0, 500)+'...';
+            var content = res.body.trim();
+            if (content.length > MAX_DESCRIPTION_SIZE) {
+                content = content.slice(0, MAX_DESCRIPTION_SIZE).trim()+'...';
             }
             var $content = $('<p>').html(content);
 
