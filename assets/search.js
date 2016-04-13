@@ -2,6 +2,7 @@ require([
     'gitbook',
     'jquery'
 ], function(gitbook, $) {
+    // DOM Elements
     var $body = $('body');
     var $bookSearchResults;
     var $searchInput;
@@ -9,6 +10,8 @@ require([
     var $searchTitle;
     var $searchResultsCount;
     var $searchQuery;
+
+    var MAX_RESULTS = 15;
 
     // Throttle search
     function throttle(fn, wait) {
@@ -109,7 +112,7 @@ require([
                 $bookSearchResults.removeClass('open');
             }
             else {
-                throttle(gitbook.search.query(q)
+                throttle(gitbook.search.query(q, 0, MAX_RESULTS)
                 .then(function(results) {
                     displayResults(results);
                 }), 1500);

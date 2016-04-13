@@ -25,9 +25,9 @@ require([
     }
 
     // Launch search for query q
-    function query(q) {
+    function query(q, offset, length) {
         if (!initialized) throw new Error('Search has not been initialized');
-        return engine.search(q);
+        return engine.search(q, offset, length);
     }
 
     // Get stats about search
