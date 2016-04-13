@@ -5,6 +5,8 @@ require([
     var MAX_RESULTS = 15;
     var MAX_DESCRIPTION_SIZE = 500;
 
+    var usePushState = (typeof history.pushState !== 'undefined');
+
     // DOM Elements
     var $body = $('body');
     var $bookSearchResults;
@@ -92,6 +94,26 @@ require([
         });
     }
 
+    function launchSearch(q) {
+        // Launch search query
+        throttle(gitbook.search.query(q, 0, MAX_RESULTS)
+        .then(function(results) {
+            displayResults(results);
+        }), 1500);
+    }
+
+    function launchSearchFromQueryString() {
+        var q = getParameterByName('q');
+        if (q && q.length > 0) {
+            // Toggle search
+            toggleSearch(true);
+            // Update search input
+            $searchInput.val(q);
+            // Launch search
+            launchSearch(q);
+        }
+    }
+
     function bindSearch() {
         // Bind DOM
         $searchInput        = $('#book-search-input');
@@ -102,9 +124,15 @@ require([
         $searchQuery        = $searchTitle.find('.search-query');
 
         // Type in search bar
-        $(document).on('keyup', '#book-search-input', function(e) {
+        $('#book-search-input').on('keyup', function(e) {
             var key = (e.keyCode ? e.keyCode : e.which);
             var q = $(this).val();
+
+            // Update history state
+            if (usePushState) {
+                var uri = updateQueryString('q', q);
+                history.pushState({ path: uri }, null, uri);
+            }
 
             if (key == 27) {
                 e.preventDefault();
@@ -115,18 +143,12 @@ require([
                 $bookSearchResults.removeClass('open');
             }
             else {
-                throttle(gitbook.search.query(q, 0, MAX_RESULTS)
-                .then(function(results) {
-                    displayResults(results);
-                }), 1500);
+                launchSearch(q);
             }
         });
-
-        // Close search
-        toggleSearch(false);
     }
 
-    gitbook.events.bind('start', function() {
+    gitbook.events.on('start', function() {
         // Create the toggle search button
         if (gitbook.toolbar) {
             gitbook.toolbar.createButton({
@@ -143,7 +165,61 @@ require([
         }
     });
 
-    gitbook.events.bind('page.change', bindSearch);
+    gitbook.events.on('page.change', function() {
+        bindSearch();
+
+        // Launch search based on query parameter
+        if (gitbook.search.isInitialized) {
+            launchSearchFromQueryString();
+        }
+    });
+
+    gitbook.events.on('search.ready', function() {
+        // Launch search from query param at start
+        launchSearchFromQueryString();
+    });
+
+    function getParameterByName(name) {
+        var url = window.location.href;
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)', 'i'),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    function updateQueryString(key, value) {
+        value = encodeURIComponent(value);
+
+        var url = window.location.href;
+        var re = new RegExp('([?&])' + key + '=.*?(&|#|$)(.*)', 'gi'),
+            hash;
+
+        if (re.test(url)) {
+            if (typeof value !== 'undefined' && value !== null)
+                return url.replace(re, '$1' + key + '=' + value + '$2$3');
+            else {
+                hash = url.split('#');
+                url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
+                if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                    url += '#' + hash[1];
+                return url;
+            }
+        }
+        else {
+            if (typeof value !== 'undefined' && value !== null) {
+                var separator = url.indexOf('?') !== -1 ? '&' : '?';
+                hash = url.split('#');
+                url = hash[0] + separator + key + '=' + value;
+                if (typeof hash[1] !== 'undefined' && hash[1] !== null)
+                    url += '#' + hash[1];
+                return url;
+            }
+            else
+                return url;
+        }
+    }
 });
 
 
