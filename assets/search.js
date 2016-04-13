@@ -102,7 +102,10 @@ require([
                 toggleSearch(false);
                 return;
             }
-            if (q.length > 0) {
+            if (q.length == 0) {
+                $bookSearchResults.removeClass('open');
+            }
+            else {
                 throttle(gitbook.search.query(q)
                 .then(function(results) {
                     displayResults(results);
