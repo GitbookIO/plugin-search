@@ -1,50 +1,49 @@
 // Search
-@search-results-max-width:            600px;
 @search-padding-default:              1.5rem;
 @search-results-opacity:              0.95;
 @gb-palette-blue:                     #428bca;
 @search-highlight-color:              yellow;
 
-.book {
-    .book-summary  .book-search {
-        padding: 6px;
+
+.book-summary  .book-search {
+    padding: 6px;
+    background: transparent;
+
+    position: absolute;
+    top: -50px;
+    left: 0px;
+    right: 0px;
+
+    transition: top 0.5s ease;
+
+    input, input:focus, input:hover {
+        width: 100%;
         background: transparent;
-
-        position: absolute;
-        top: -50px;
-        left: 0px;
-        right: 0px;
-
-        transition: top 0.5s ease;
-
-        input, input:focus, input:hover {
-            width: 100%;
-            background: transparent;
-            border: 1px solid transparent;
-            box-shadow: none;
-            outline: none;
-            line-height: 22px;
-            padding: 7px 4px;
-            color: inherit;
-        }
+        border: 1px solid transparent;
+        box-shadow: none;
+        outline: none;
+        line-height: 22px;
+        padding: 7px 4px;
+        color: inherit;
     }
+}
 
-    &.with-search {
-        .book-summary {
-            .book-search {
-                top: 0px;
-            }
+body.with-search {
+    .book-summary {
+        .book-search {
+            top: 0px;
+        }
 
-            ul.summary {
-                top: 50px;
-            }
+        ul.summary {
+            top: 50px;
         }
     }
 }
 
-.book-search-results {
+#book-search-results {
     .search-results {
         display: none;
+        padding: @search-padding-default @search-padding-default*2;
 
         ul.search-results-list {
             list-style-type: none;
@@ -53,7 +52,6 @@
             li {
                 margin-bottom: @search-padding-default;
                 padding-bottom: @search-padding-default/3;
-                max-width: @search-results-max-width;
 
                 a {
                     /* @gb-palette-blue */
@@ -72,6 +70,7 @@
         .search-results {
             display: block;
         }
+
         .search-noresults {
             display: none;
         }
