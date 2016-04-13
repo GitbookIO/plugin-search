@@ -2,17 +2,17 @@
 
 {% block search_input %}
 <div class="book-search" role="search">
-    <input name="search-input" type="text" class="form-control" placeholder="Type to search" />
+    <input id="book-search-input" type="text" class="form-control" placeholder="{{ 'SEARCH_PLACEHOLDER'|t }}" />
 </div>
 {% endblock %}
 
 {% block search_results %}
-<div class="book-search-results">
+<div id="book-search-results">
     <div class="search-noresults">
     {{ super() }}
     </div>
     <div class="search-results">
-        <h1 class="search-results-title"></h1>
+        <h1 class="search-results-title">{{ 'SEARCH_RESULTS_TITLE'|t|safe }}</h1>
         <ul class="search-results-list"></ul>
     </div>
 </div>
