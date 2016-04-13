@@ -70,7 +70,10 @@ require([
                 'text': res.title
             });
 
-            var content = res.body.slice(0, 500)+'...';
+            var content = res.body;
+            if (content.length > 500) {
+                content = content.slice(0, 500)+'...';
+            }
             var $content = $('<p>').html(content);
 
             $link.appendTo($title);
