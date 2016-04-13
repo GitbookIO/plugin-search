@@ -21,6 +21,7 @@ require([
         return engine.init(config)
         .then(function() {
             initialized = true;
+            gitbook.events.trigger('search.ready');
         });
     }
 
