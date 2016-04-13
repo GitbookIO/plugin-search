@@ -8,6 +8,9 @@ var searchIndex = lunr(function () {
     this.field('body');
 });
 
+// Map of Lunr ref to document
+var documentsStore = {};
+
 var searchIndexEnabled = true;
 var indexSize = 0;
 
@@ -43,11 +46,14 @@ module.exports = {
             }
 
             // Add to index
-            searchIndex.add({
+            var doc = {
                 url: this.output.toURL(page.path),
                 title: page.title,
                 body: text
-            });
+            };
+
+            documentsStore[doc.url] = doc;
+            searchIndex.add(doc);
 
             return page;
         },
@@ -57,7 +63,10 @@ module.exports = {
             if (this.output.name != 'website') return;
 
             this.log.debug.ln('write search index');
-            return this.output.writeFile('search_index.json', JSON.stringify(searchIndex));
+            return this.output.writeFile('search_index.json', JSON.stringify({
+                index: searchIndex,
+                store: documentsStore
+            }));
         }
     }
 };

@@ -5,6 +5,7 @@ require([
     // Define global search engine
     function LunrSearchEngine() {
         this.index = null;
+        this.store = {};
         this.name = 'LunrSearchEngine';
     }
 
@@ -16,7 +17,8 @@ require([
         $.getJSON(gitbook.state.basePath+'/search_index.json')
         .then(function(data) {
             // eslint-disable-next-line no-undef
-            that.index = lunr.Index.load(data);
+            that.index = lunr.Index.load(data.index);
+            that.store = data.store;
             d.resolve();
         });
 
@@ -25,19 +27,20 @@ require([
 
     // Search for a term and return results
     LunrSearchEngine.prototype.search = function(q) {
-        if (!this.index) {
-            return $.Deferred().resolve([]).promise();
+        var that = this;
+        var results = [];
+
+        if (this.index) {
+            results = $.map(this.index.search(q), function(result) {
+                return that.store[result.ref];
+            });
         }
 
-        var results = $.map(this.index.search(q), function(result) {
-            var parts = result.ref.split('#');
-            return {
-                path: parts[0],
-                hash: parts[1]
-            };
-        });
-
-        return $.Deferred().resolve(results).promise();
+        return $.Deferred().resolve({
+            query: q,
+            results: results,
+            count: results.length
+        }).promise();
     };
 
     // Set gitbook research
