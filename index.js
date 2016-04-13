@@ -49,6 +49,7 @@ module.exports = {
             var doc = {
                 url: this.output.toURL(page.path),
                 title: page.title,
+                summary: page.description,
                 body: text
             };
 

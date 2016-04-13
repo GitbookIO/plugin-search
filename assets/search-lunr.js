@@ -32,7 +32,13 @@ require([
 
         if (this.index) {
             results = $.map(this.index.search(q), function(result) {
-                return that.store[result.ref];
+                var doc = that.store[result.ref];
+
+                return {
+                    title: doc.title,
+                    url: doc.url,
+                    body: doc.summary || doc.body
+                };
             });
         }
 
