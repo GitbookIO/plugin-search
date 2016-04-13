@@ -128,12 +128,6 @@ require([
             var key = (e.keyCode ? e.keyCode : e.which);
             var q = $(this).val();
 
-            // Update history state
-            if (usePushState) {
-                var uri = updateQueryString('q', q);
-                history.pushState({ path: uri }, null, uri);
-            }
-
             if (key == 27) {
                 e.preventDefault();
                 toggleSearch(false);
@@ -146,6 +140,16 @@ require([
                 launchSearch(q);
             }
         });
+
+        $('#book-search-input').on('blur', function(e) {
+            // Update history state
+            if (usePushState) {
+                var uri = updateQueryString('q', $(this).val());
+                history.pushState({ path: uri }, null, uri);
+            }
+        });
+
+        toggleSearch(false);
     }
 
     gitbook.events.on('start', function() {
