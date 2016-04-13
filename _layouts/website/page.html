@@ -12,8 +12,13 @@
     {{ super() }}
     </div>
     <div class="search-results">
-        <h1 class="search-results-title">{{ 'SEARCH_RESULTS_TITLE'|t|safe }}</h1>
-        <ul class="search-results-list"></ul>
+        <div class="has-results">
+            <h1 class="search-results-title">{{ 'SEARCH_RESULTS_TITLE'|t|safe }}</h1>
+            <ul class="search-results-list"></ul>
+        </div>
+        <div class="no-results">
+            <h1 class="search-results-title">{{ 'SEARCH_NO_RESULTS_TITLE'|t|safe }}</h1>
+        </div>
     </div>
 </div>
 {% endblock %}

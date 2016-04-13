@@ -50,6 +50,9 @@ require([
     function displayResults(res) {
         $bookSearchResults.addClass('open');
 
+        var noResults = res.count == 0;
+        $bookSearchResults.toggleClass('no-results', noResults);
+
         // Clear old results
         $searchList.empty();
 
