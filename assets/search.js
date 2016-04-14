@@ -95,11 +95,16 @@ require([
     }
 
     function launchSearch(q) {
+        // Add class for loading
+        $body.addClass('search-loading');
         // Launch search query
         throttle(gitbook.search.query(q, 0, MAX_RESULTS)
         .then(function(results) {
             displayResults(results);
-        }), 1500);
+        })
+        .always(function() {
+            $body.removeClass('search-loading');
+        }), 1000);
     }
 
     function launchSearchFromQueryString() {
