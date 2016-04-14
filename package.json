@@ -6,10 +6,7 @@
   "engines": {
     "gitbook": ">=3.0.0-pre.0"
   },
-  "dependencies": {
-    "lunr": "0.5.12",
-    "lodash": "3.10.1"
-  },
+  "dependencies": {},
   "homepage": "https://github.com/GitbookIO/plugin-search",
   "repository": {
     "type": "git",
@@ -24,15 +21,6 @@
     "less": "2.5.1"
   },
   "scripts": {
-    "prepublish": "cp node_modules/lunr/lunr.min.js ./assets/lunr.min.js;lessc ./less/search.less > ./assets/search.css"
-  },
-  "gitbook": {
-    "properties": {
-      "maxIndexSize": {
-        "type": "number",
-        "title": "Limit size for the index",
-        "default": 1000000
-      }
-    }
+    "prepublish": "lessc ./less/search.less > ./assets/search.css"
   }
 }
