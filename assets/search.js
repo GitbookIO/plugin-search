@@ -179,6 +179,8 @@ require([
     });
 
     gitbook.events.on('search.ready', function() {
+        bindSearch();
+
         // Launch search from query param at start
         launchSearchFromQueryString();
     });
