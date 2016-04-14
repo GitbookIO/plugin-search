@@ -1,7 +1,4 @@
 var lunr = require('lunr');
-var fs = require('fs');
-var path = require('path');
-var _ = require('lodash');
 
 // Create search index
 var searchIndex = lunr(function () {
@@ -11,6 +8,9 @@ var searchIndex = lunr(function () {
     this.field('body');
 });
 
+// Map of Lunr ref to document
+var documentsStore = {};
+
 var searchIndexEnabled = true;
 var indexSize = 0;
 
@@ -18,7 +18,7 @@ module.exports = {
     book: {
         assets: './assets',
         js: [
-            'lunr.min.js', 'search.js'
+            'lunr.min.js', 'search-engine.js', 'search-lunr.js', 'search.js'
         ],
         css: [
             'search.css'
@@ -27,7 +27,7 @@ module.exports = {
 
     hooks: {
         // Index each page
-        "page": function(page) {
+        'page': function(page) {
             if (this.output.name != 'website' || !searchIndexEnabled) return page;
 
             var text, maxIndexSize;
@@ -40,27 +40,34 @@ module.exports = {
 
             indexSize = indexSize + text.length;
             if (indexSize > maxIndexSize) {
-                this.log.warn.ln("search index is too big, indexing is now disabled");
+                this.log.warn.ln('search index is too big, indexing is now disabled');
                 searchIndexEnabled = false;
                 return page;
             }
 
             // Add to index
-            searchIndex.add({
+            var doc = {
                 url: this.output.toURL(page.path),
                 title: page.title,
+                summary: page.description,
                 body: text
-            });
+            };
+
+            documentsStore[doc.url] = doc;
+            searchIndex.add(doc);
 
             return page;
         },
 
         // Write index to disk
-        "finish": function() {
+        'finish': function() {
             if (this.output.name != 'website') return;
 
             this.log.debug.ln('write search index');
-            return this.output.writeFile('search_index.json', JSON.stringify(searchIndex));
+            return this.output.writeFile('search_index.json', JSON.stringify({
+                index: searchIndex,
+                store: documentsStore
+            }));
         }
     }
 };

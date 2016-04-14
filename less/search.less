@@ -1,35 +1,92 @@
-.book {
-    .book-summary  .book-search {
-        padding: 6px;
+// Search
+@search-padding-default:              1.5rem;
+@search-results-opacity:              0.95;
+@gb-palette-blue:                     #428bca;
+@search-highlight-color:              #FFDC00;
+
+
+.book-summary  .book-search {
+    padding: 6px;
+    background: transparent;
+
+    position: absolute;
+    top: -50px;
+    left: 0px;
+    right: 0px;
+
+    transition: top 0.5s ease;
+
+    input, input:focus, input:hover {
+        width: 100%;
         background: transparent;
+        border: 1px solid transparent;
+        box-shadow: none;
+        outline: none;
+        line-height: 22px;
+        padding: 7px 4px;
+        color: inherit;
+    }
+}
 
-        position: absolute;
-        top: -50px;
-        left: 0px;
-        right: 0px;
+body.with-search {
+    .book-summary {
+        .book-search {
+            top: 0px;
+        }
 
-        transition: top 0.5s ease;
+        ul.summary {
+            top: 50px;
+        }
+    }
+}
 
-        input, input:focus, input:hover {
-            width: 100%;
-            background: transparent;
-            border: 1px solid transparent;
-            box-shadow: none;
-            outline: none;
-            line-height: 22px;
-            padding: 7px 4px;
-            color: inherit;
+#book-search-results {
+    .search-results {
+        display: none;
+
+        ul.search-results-list {
+            list-style-type: none;
+            padding-left: 0;
+
+            li {
+                margin-bottom: @search-padding-default;
+                padding-bottom: @search-padding-default/3;
+
+                a {
+                    /* @gb-palette-blue */
+                    color: @gb-palette-blue;
+                }
+
+                /* Highlight results */
+                p em {
+                    background-color: @search-highlight-color;
+                }
+            }
+        }
+
+        .no-results {
+            display: none;
         }
     }
 
-    &.with-search {
-        .book-summary {
-            .book-search {
-                top: 0px;
+    &.open {
+        .search-results {
+            display: block;
+        }
+
+        .search-noresults {
+            display: none;
+        }
+    }
+
+    &.no-results {
+        .search-results {
+            .has-results {
+                display: none;
             }
 
-            ul.summary {
-                top: 50px;
+            .no-results {
+                display: block;
             }
         }
     }
