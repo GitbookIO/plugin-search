@@ -128,24 +128,48 @@ require([
         $searchResultsCount = $searchTitle.find('.search-results-count');
         $searchQuery        = $searchTitle.find('.search-query');
 
-        // Type in search bar
+        // Detect escape key in search input
         $('#book-search-input').on('keyup', function(e) {
             var key = (e.keyCode ? e.keyCode : e.which);
-            var q = $(this).val();
-
             if (key == 27) {
                 e.preventDefault();
                 toggleSearch(false);
-                return;
             }
+        });
+
+        // Launch query based on input content
+        function handleUpdate(element) {
+            var q = element.val();
+
             if (q.length == 0) {
                 $bookSearchResults.removeClass('open');
             }
             else {
                 launchSearch(q);
             }
+        }
+
+        // Detect true content change in search input
+        // Workaround for IE < 9
+        var propertyChangeUnbound = false;
+        $('#book-search-input').on('propertychange', function(e) {
+            if (e.originalEvent.propertyName == 'value') {
+                handleUpdate($(this));
+            }
         });
 
+        // HTML5 (IE9 & others)
+        $('#book-search-input').on('input', function(e) {
+            // Unbind propertychange event for IE9+
+            if (!propertyChangeUnbound) {
+                $(this).unbind('propertychange');
+                propertyChangeUnbound = true;
+            }
+
+            handleUpdate($(this));
+        });
+
+        // Push to history on blur
         $('#book-search-input').on('blur', function(e) {
             // Update history state
             if (usePushState) {
