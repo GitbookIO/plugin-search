@@ -1,6 +1,6 @@
 {
   "name": "gitbook-plugin-search",
-  "description": "Search input for yoru GitBook",
+  "description": "Search input for your GitBook",
   "main": "index.js",
   "version": "2.0.1",
   "engines": {
