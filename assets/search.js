@@ -53,7 +53,7 @@ require([
             var $title = $('<h3>');
 
             var $link = $('<a>', {
-                'href': gitbook.state.root+res.url,
+                'href': gitbook.state.basePath + '/' + res.url,
                 'text': res.title
             });
 
