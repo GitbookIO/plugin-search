@@ -31,30 +31,6 @@ require([
         };
     }
 
-    // Return true if search is open
-    function isSearchOpen() {
-        return $body.hasClass('with-search');
-    }
-
-    // Toggle the search
-    function toggleSearch(_state) {
-        if (isSearchOpen() === _state) return;
-
-        $body.toggleClass('with-search', _state);
-
-        // If search bar is open: focus input
-        if (isSearchOpen()) {
-            if (gitbook.sidebar) {
-                gitbook.sidebar.toggle(true);
-            }
-            $searchInput.focus();
-        } else {
-            $searchInput.blur();
-            $searchInput.val('');
-            $bookSearchResults.removeClass('open');
-        }
-    }
-
     function displayResults(res) {
         $bookSearchResults.addClass('open');
 
@@ -96,7 +72,9 @@ require([
 
     function launchSearch(q) {
         // Add class for loading
+        $body.addClass('with-search');
         $body.addClass('search-loading');
+
         // Launch search query
         throttle(gitbook.search.query(q, 0, MAX_RESULTS)
         .then(function(results) {
@@ -107,13 +85,17 @@ require([
         }), 1000);
     }
 
+    function closeSearch() {
+        $body.removeClass('with-search');
+        $bookSearchResults.removeClass('open');
+    }
+
     function launchSearchFromQueryString() {
         var q = getParameterByName('q');
         if (q && q.length > 0) {
-            // Toggle search
-            toggleSearch(true);
             // Update search input
             $searchInput.val(q);
+
             // Launch search
             launchSearch(q);
         }
@@ -121,28 +103,19 @@ require([
 
     function bindSearch() {
         // Bind DOM
-        $searchInput        = $('#book-search-input');
+        $searchInput        = $('#book-search-input input');
         $bookSearchResults  = $('#book-search-results');
         $searchList         = $bookSearchResults.find('.search-results-list');
         $searchTitle        = $bookSearchResults.find('.search-results-title');
         $searchResultsCount = $searchTitle.find('.search-results-count');
         $searchQuery        = $searchTitle.find('.search-query');
 
-        // Detect escape key in search input
-        $('#book-search-input').on('keyup', function(e) {
-            var key = (e.keyCode ? e.keyCode : e.which);
-            if (key == 27) {
-                e.preventDefault();
-                toggleSearch(false);
-            }
-        });
-
         // Launch query based on input content
-        function handleUpdate(element) {
-            var q = element.val();
+        function handleUpdate() {
+            var q = $searchInput.val();
 
             if (q.length == 0) {
-                $bookSearchResults.removeClass('open');
+                closeSearch();
             }
             else {
                 launchSearch(q);
@@ -152,51 +125,32 @@ require([
         // Detect true content change in search input
         // Workaround for IE < 9
         var propertyChangeUnbound = false;
-        $('#book-search-input').on('propertychange', function(e) {
+        $searchInput.on('propertychange', function(e) {
             if (e.originalEvent.propertyName == 'value') {
-                handleUpdate($(this));
+                handleUpdate();
             }
         });
 
         // HTML5 (IE9 & others)
-        $('#book-search-input').on('input', function(e) {
+        $searchInput.on('input', function(e) {
             // Unbind propertychange event for IE9+
             if (!propertyChangeUnbound) {
                 $(this).unbind('propertychange');
                 propertyChangeUnbound = true;
             }
 
-            handleUpdate($(this));
+            handleUpdate();
         });
 
         // Push to history on blur
-        $('#book-search-input').on('blur', function(e) {
+        $searchInput.on('blur', function(e) {
             // Update history state
             if (usePushState) {
                 var uri = updateQueryString('q', $(this).val());
                 history.pushState({ path: uri }, null, uri);
             }
         });
-
-        toggleSearch(false);
     }
-
-    gitbook.events.on('start', function() {
-        // Create the toggle search button
-        if (gitbook.toolbar) {
-            gitbook.toolbar.createButton({
-                icon: 'fa fa-search',
-                label: 'Search',
-                position: 'left',
-                onClick: toggleSearch
-            });
-        }
-
-        // Bind keyboard to toggle search
-        if (gitbook.keyboard) {
-            gitbook.keyboard.bind(['f'], toggleSearch);
-        }
-    });
 
     gitbook.events.on('page.change', function() {
         bindSearch();
@@ -256,5 +210,3 @@ require([
         }
     }
 });
-
-

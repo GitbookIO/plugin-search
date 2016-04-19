@@ -1,44 +1,11 @@
-// Search
 @search-padding-default:              1.5rem;
 @search-results-opacity:              0.95;
-@gb-palette-blue:                     #428bca;
 @search-highlight-color:              rgba(255, 220, 0, 0.4);
 
-
-.book-summary  .book-search {
-    padding: 6px;
-    background: transparent;
-
-    position: absolute;
-    top: -50px;
-    left: 0px;
-    right: 0px;
-
-    transition: top 0.5s ease;
-
-    input, input:focus, input:hover {
-        width: 100%;
-        background: transparent;
-        border: 1px solid transparent;
-        box-shadow: none;
-        outline: none;
-        line-height: 22px;
-        padding: 7px 4px;
-        color: inherit;
-    }
-}
-
-body.with-search {
-    .book-summary {
-        .book-search {
-            top: 0px;
-        }
-
-        ul.summary {
-            top: 50px;
-        }
-    }
-}
+/*
+    This CSS only styled the search results section, not the search input
+    It defines the basic interraction to hide content when displaying results, etc
+*/
 
 #book-search-results {
     .search-results {
@@ -51,11 +18,6 @@ body.with-search {
             li {
                 margin-bottom: @search-padding-default;
                 padding-bottom: @search-padding-default/3;
-
-                a {
-                    /* @gb-palette-blue */
-                    color: @gb-palette-blue;
-                }
 
                 /* Highlight results */
                 p em {
