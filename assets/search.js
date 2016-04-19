@@ -153,6 +153,7 @@ require([
     }
 
     gitbook.events.on('page.change', function() {
+        closeSearch();
         bindSearch();
 
         // Launch search based on query parameter
