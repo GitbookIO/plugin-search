@@ -54,7 +54,10 @@ require([
 
             var $link = $('<a>', {
                 'href': gitbook.state.basePath + '/' + res.url,
-                'text': res.title
+                'text': res.title,
+                'click': function(e) {
+                    closeSearch();
+                }
             });
 
             var content = res.body.trim();
@@ -88,6 +91,8 @@ require([
     function closeSearch() {
         $body.removeClass('with-search');
         $bookSearchResults.removeClass('open');
+        // Empty search input
+        $searchInput.val('');
     }
 
     function launchSearchFromQueryString() {
