@@ -157,7 +157,7 @@ require([
         closeSearch();
 
         // Launch search based on query parameter
-        if (gitbook.search.isInitialized) {
+        if (gitbook.search.isInitialized()) {
             launchSearchFromQueryString();
         }
     });
